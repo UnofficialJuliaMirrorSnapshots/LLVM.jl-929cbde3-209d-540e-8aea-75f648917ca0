@@ -1,18 +1,12 @@
 environment:
   matrix:
-  - julia_version: 0.7
   - julia_version: 1.0
+  - julia_version: 1.1
   - julia_version: latest
 
 platform:
   - x86
   - x64
-
-branches:
-  only:
-    - master
-    - staging
-    - trying
 
 notifications:
   - provider: Email

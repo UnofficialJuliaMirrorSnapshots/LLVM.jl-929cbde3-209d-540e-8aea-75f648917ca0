@@ -88,14 +88,24 @@ end
 
 if VERSION < v"1.2.0-DEV.531"
 
-function LLVMAddNVVMReflectPass(PM::LLVMPassManagerRef)
+function LLVMAddNVVMReflectPass(PM::LLVMPassManagerRef, smversion)
     @apicall(:LLVMExtraAddMVVMReflectPass,Cvoid,(LLVMPassManagerRef,), PM)
 end
 
 else
 
-function LLVMAddNVVMReflectPass(PM::LLVMPassManagerRef)
+if libllvm_version < v"8.0"
+
+function LLVMAddNVVMReflectPass(PM::LLVMPassManagerRef, smversion)
     @apicall(:LLVMExtraAddNVVMReflectPass,Cvoid,(LLVMPassManagerRef,), PM)
+end
+
+else
+
+function LLVMAddNVVMReflectPass(PM::LLVMPassManagerRef, smversion)
+    @apicall(:LLVMExtraAddNVVMReflectFunctionPass,Cvoid,(LLVMPassManagerRef, Cuint), PM, smversion)
+end
+
 end
 
 function LLVMAddAllocOptPass(PM::LLVMPassManagerRef)
@@ -150,4 +160,13 @@ function LLVMGetSourceLocation(V::LLVMValueRef, index, Name, Filename, Line, Col
     @apicall(:LLVMExtraGetSourceLocation,Cint,(LLVMValueRef,Cint,Ptr{Cstring},Ptr{Cstring},Ptr{Cuint},Ptr{Cuint}), V, index, Name, Filename, Line, Column)
 end
 
+end
+
+if libllvm_version >= v"8.0"
+    @cenum(LLVMDebugEmissionKind,
+        LLVMDebugEmissionKindNoDebug = 0,
+        LLVMDebugEmissionKindFullDebug = 1,
+        LLVMDebugEmissionKindLineTablesOnly = 2,
+        LLVMDebugEmissionKindDebugDirectivesOnly = 3,
+    )
 end

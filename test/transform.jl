@@ -68,7 +68,9 @@ ModulePassManager() do pm
     scoped_no_alias_aa!(pm)
     basic_alias_analysis!(pm)
 
-    bbvectorize!(pm)
+    if LLVM.version() < v"8.0"
+        bbvectorize!(pm)
+    end
     loop_vectorize!(pm)
     slpvectorize!(pm)
 
