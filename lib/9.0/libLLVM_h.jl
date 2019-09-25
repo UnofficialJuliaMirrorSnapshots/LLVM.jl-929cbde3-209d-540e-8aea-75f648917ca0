@@ -1669,6 +1669,10 @@ function LLVMSetPersonalityFn(Fn, PersonalityFn)
     @apicall(:LLVMSetPersonalityFn, Cvoid, (LLVMValueRef, LLVMValueRef), Fn, PersonalityFn)
 end
 
+function LLVMLookupIntrinsicID(Name, NameLen)
+    @apicall(:LLVMLookupIntrinsicID, UInt32, (Cstring, Csize_t), Name, NameLen)
+end
+
 function LLVMGetIntrinsicID(Fn)
     @apicall(:LLVMGetIntrinsicID, UInt32, (LLVMValueRef,), Fn)
 end
@@ -1777,20 +1781,52 @@ function LLVMSetParamAlignment(Arg, Align)
     @apicall(:LLVMSetParamAlignment, Cvoid, (LLVMValueRef, UInt32), Arg, Align)
 end
 
-function LLVMMDStringInContext(C, Str, SLen)
-    @apicall(:LLVMMDStringInContext, LLVMValueRef, (LLVMContextRef, Cstring, UInt32), C, Str, SLen)
+function LLVMAddGlobalIFunc(M, Name, NameLen, Ty, AddrSpace, Resolver)
+    @apicall(:LLVMAddGlobalIFunc, LLVMValueRef, (LLVMModuleRef, Cstring, Csize_t, LLVMTypeRef, UInt32, LLVMValueRef), M, Name, NameLen, Ty, AddrSpace, Resolver)
 end
 
-function LLVMMDString(Str, SLen)
-    @apicall(:LLVMMDString, LLVMValueRef, (Cstring, UInt32), Str, SLen)
+function LLVMGetNamedGlobalIFunc(M, Name, NameLen)
+    @apicall(:LLVMGetNamedGlobalIFunc, LLVMValueRef, (LLVMModuleRef, Cstring, Csize_t), M, Name, NameLen)
 end
 
-function LLVMMDNodeInContext(C, Vals, Count)
-    @apicall(:LLVMMDNodeInContext, LLVMValueRef, (LLVMContextRef, Ptr{LLVMValueRef}, UInt32), C, Vals, Count)
+function LLVMGetFirstGlobalIFunc(M)
+    @apicall(:LLVMGetFirstGlobalIFunc, LLVMValueRef, (LLVMModuleRef,), M)
 end
 
-function LLVMMDNode(Vals, Count)
-    @apicall(:LLVMMDNode, LLVMValueRef, (Ptr{LLVMValueRef}, UInt32), Vals, Count)
+function LLVMGetLastGlobalIFunc(M)
+    @apicall(:LLVMGetLastGlobalIFunc, LLVMValueRef, (LLVMModuleRef,), M)
+end
+
+function LLVMGetNextGlobalIFunc(IFunc)
+    @apicall(:LLVMGetNextGlobalIFunc, LLVMValueRef, (LLVMValueRef,), IFunc)
+end
+
+function LLVMGetPreviousGlobalIFunc(IFunc)
+    @apicall(:LLVMGetPreviousGlobalIFunc, LLVMValueRef, (LLVMValueRef,), IFunc)
+end
+
+function LLVMGetGlobalIFuncResolver(IFunc)
+    @apicall(:LLVMGetGlobalIFuncResolver, LLVMValueRef, (LLVMValueRef,), IFunc)
+end
+
+function LLVMSetGlobalIFuncResolver(IFunc, Resolver)
+    @apicall(:LLVMSetGlobalIFuncResolver, Cvoid, (LLVMValueRef, LLVMValueRef), IFunc, Resolver)
+end
+
+function LLVMEraseGlobalIFunc(IFunc)
+    @apicall(:LLVMEraseGlobalIFunc, Cvoid, (LLVMValueRef,), IFunc)
+end
+
+function LLVMRemoveGlobalIFunc(IFunc)
+    @apicall(:LLVMRemoveGlobalIFunc, Cvoid, (LLVMValueRef,), IFunc)
+end
+
+function LLVMMDStringInContext2(C, Str, SLen)
+    @apicall(:LLVMMDStringInContext2, LLVMMetadataRef, (LLVMContextRef, Cstring, Csize_t), C, Str, SLen)
+end
+
+function LLVMMDNodeInContext2(C, MDs, Count)
+    @apicall(:LLVMMDNodeInContext2, LLVMMetadataRef, (LLVMContextRef, Ptr{LLVMMetadataRef}, Csize_t), C, MDs, Count)
 end
 
 function LLVMMetadataAsValue(C, MD)
@@ -1811,6 +1847,22 @@ end
 
 function LLVMGetMDNodeOperands(V, Dest)
     @apicall(:LLVMGetMDNodeOperands, Cvoid, (LLVMValueRef, Ptr{LLVMValueRef}), V, Dest)
+end
+
+function LLVMMDStringInContext(C, Str, SLen)
+    @apicall(:LLVMMDStringInContext, LLVMValueRef, (LLVMContextRef, Cstring, UInt32), C, Str, SLen)
+end
+
+function LLVMMDString(Str, SLen)
+    @apicall(:LLVMMDString, LLVMValueRef, (Cstring, UInt32), Str, SLen)
+end
+
+function LLVMMDNodeInContext(C, Vals, Count)
+    @apicall(:LLVMMDNodeInContext, LLVMValueRef, (LLVMContextRef, Ptr{LLVMValueRef}, UInt32), C, Vals, Count)
+end
+
+function LLVMMDNode(Vals, Count)
+    @apicall(:LLVMMDNode, LLVMValueRef, (Ptr{LLVMValueRef}, UInt32), Vals, Count)
 end
 
 function LLVMBasicBlockAsValue(BB)
@@ -1863,6 +1915,14 @@ end
 
 function LLVMGetEntryBasicBlock(Fn)
     @apicall(:LLVMGetEntryBasicBlock, LLVMBasicBlockRef, (LLVMValueRef,), Fn)
+end
+
+function LLVMInsertExistingBasicBlockAfterInsertBlock(Builder, BB)
+    @apicall(:LLVMInsertExistingBasicBlockAfterInsertBlock, Cvoid, (LLVMBuilderRef, LLVMBasicBlockRef), Builder, BB)
+end
+
+function LLVMAppendExistingBasicBlock(Fn, BB)
+    @apicall(:LLVMAppendExistingBasicBlock, Cvoid, (LLVMValueRef, LLVMBasicBlockRef), Fn, BB)
 end
 
 function LLVMCreateBasicBlockInContext(C, Name)
@@ -2145,16 +2205,32 @@ function LLVMDisposeBuilder(Builder)
     @apicall(:LLVMDisposeBuilder, Cvoid, (LLVMBuilderRef,), Builder)
 end
 
+function LLVMGetCurrentDebugLocation2(Builder)
+    @apicall(:LLVMGetCurrentDebugLocation2, LLVMMetadataRef, (LLVMBuilderRef,), Builder)
+end
+
+function LLVMSetCurrentDebugLocation2(Builder, Loc)
+    @apicall(:LLVMSetCurrentDebugLocation2, Cvoid, (LLVMBuilderRef, LLVMMetadataRef), Builder, Loc)
+end
+
+function LLVMSetInstDebugLocation(Builder, Inst)
+    @apicall(:LLVMSetInstDebugLocation, Cvoid, (LLVMBuilderRef, LLVMValueRef), Builder, Inst)
+end
+
+function LLVMBuilderGetDefaultFPMathTag(Builder)
+    @apicall(:LLVMBuilderGetDefaultFPMathTag, LLVMMetadataRef, (LLVMBuilderRef,), Builder)
+end
+
+function LLVMBuilderSetDefaultFPMathTag(Builder, FPMathTag)
+    @apicall(:LLVMBuilderSetDefaultFPMathTag, Cvoid, (LLVMBuilderRef, LLVMMetadataRef), Builder, FPMathTag)
+end
+
 function LLVMSetCurrentDebugLocation(Builder, L)
     @apicall(:LLVMSetCurrentDebugLocation, Cvoid, (LLVMBuilderRef, LLVMValueRef), Builder, L)
 end
 
 function LLVMGetCurrentDebugLocation(Builder)
     @apicall(:LLVMGetCurrentDebugLocation, LLVMValueRef, (LLVMBuilderRef,), Builder)
-end
-
-function LLVMSetInstDebugLocation(Builder, Inst)
-    @apicall(:LLVMSetInstDebugLocation, Cvoid, (LLVMBuilderRef, LLVMValueRef), Builder, Inst)
 end
 
 function LLVMBuildRetVoid(arg1)
@@ -2770,6 +2846,7 @@ end
 # Automatically generated using Clang.jl
 
 
+
 # Julia wrapper for header: DebugInfo.h
 # Automatically generated using Clang.jl
 
@@ -2861,12 +2938,36 @@ function LLVMDILocationGetScope(Location)
     @apicall(:LLVMDILocationGetScope, LLVMMetadataRef, (LLVMMetadataRef,), Location)
 end
 
+function LLVMDILocationGetInlinedAt(Location)
+    @apicall(:LLVMDILocationGetInlinedAt, LLVMMetadataRef, (LLVMMetadataRef,), Location)
+end
+
+function LLVMDIScopeGetFile(Scope)
+    @apicall(:LLVMDIScopeGetFile, LLVMMetadataRef, (LLVMMetadataRef,), Scope)
+end
+
+function LLVMDIFileGetDirectory(File, Len)
+    @apicall(:LLVMDIFileGetDirectory, Cstring, (LLVMMetadataRef, Ptr{UInt32}), File, Len)
+end
+
+function LLVMDIFileGetFilename(File, Len)
+    @apicall(:LLVMDIFileGetFilename, Cstring, (LLVMMetadataRef, Ptr{UInt32}), File, Len)
+end
+
+function LLVMDIFileGetSource(File, Len)
+    @apicall(:LLVMDIFileGetSource, Cstring, (LLVMMetadataRef, Ptr{UInt32}), File, Len)
+end
+
 function LLVMDIBuilderGetOrCreateTypeArray(Builder, Data, NumElements)
     @apicall(:LLVMDIBuilderGetOrCreateTypeArray, LLVMMetadataRef, (LLVMDIBuilderRef, Ptr{LLVMMetadataRef}, Csize_t), Builder, Data, NumElements)
 end
 
 function LLVMDIBuilderCreateSubroutineType(Builder, File, ParameterTypes, NumParameterTypes, Flags)
     @apicall(:LLVMDIBuilderCreateSubroutineType, LLVMMetadataRef, (LLVMDIBuilderRef, LLVMMetadataRef, Ptr{LLVMMetadataRef}, UInt32, LLVMDIFlags), Builder, File, ParameterTypes, NumParameterTypes, Flags)
+end
+
+function LLVMDIBuilderCreateEnumerator(Builder, Name, NameLen, Value, IsUnsigned)
+    @apicall(:LLVMDIBuilderCreateEnumerator, LLVMMetadataRef, (LLVMDIBuilderRef, Cstring, Csize_t, Int64, LLVMBool), Builder, Name, NameLen, Value, IsUnsigned)
 end
 
 function LLVMDIBuilderCreateEnumerationType(Builder, Scope, Name, NameLen, File, LineNumber, SizeInBits, AlignInBits, Elements, NumElements, ClassTy)
@@ -3009,6 +3110,26 @@ function LLVMDIBuilderCreateGlobalVariableExpression(Builder, Scope, Name, NameL
     @apicall(:LLVMDIBuilderCreateGlobalVariableExpression, LLVMMetadataRef, (LLVMDIBuilderRef, LLVMMetadataRef, Cstring, Csize_t, Cstring, Csize_t, LLVMMetadataRef, UInt32, LLVMMetadataRef, LLVMBool, LLVMMetadataRef, LLVMMetadataRef, UInt32), Builder, Scope, Name, NameLen, Linkage, LinkLen, File, LineNo, Ty, LocalToUnit, Expr, Decl, AlignInBits)
 end
 
+function LLVMDIGlobalVariableExpressionGetVariable(GVE)
+    @apicall(:LLVMDIGlobalVariableExpressionGetVariable, LLVMMetadataRef, (LLVMMetadataRef,), GVE)
+end
+
+function LLVMDIGlobalVariableExpressionGetExpression(GVE)
+    @apicall(:LLVMDIGlobalVariableExpressionGetExpression, LLVMMetadataRef, (LLVMMetadataRef,), GVE)
+end
+
+function LLVMDIVariableGetFile(Var)
+    @apicall(:LLVMDIVariableGetFile, LLVMMetadataRef, (LLVMMetadataRef,), Var)
+end
+
+function LLVMDIVariableGetScope(Var)
+    @apicall(:LLVMDIVariableGetScope, LLVMMetadataRef, (LLVMMetadataRef,), Var)
+end
+
+function LLVMDIVariableGetLine(Var)
+    @apicall(:LLVMDIVariableGetLine, UInt32, (LLVMMetadataRef,), Var)
+end
+
 function LLVMTemporaryMDNode(Ctx, Data, NumElements)
     @apicall(:LLVMTemporaryMDNode, LLVMMetadataRef, (LLVMContextRef, Ptr{LLVMMetadataRef}, Csize_t), Ctx, Data, NumElements)
 end
@@ -3057,6 +3178,18 @@ function LLVMSetSubprogram(Func, SP)
     @apicall(:LLVMSetSubprogram, Cvoid, (LLVMValueRef, LLVMMetadataRef), Func, SP)
 end
 
+function LLVMDISubprogramGetLine(Subprogram)
+    @apicall(:LLVMDISubprogramGetLine, UInt32, (LLVMMetadataRef,), Subprogram)
+end
+
+function LLVMInstructionGetDebugLoc(Inst)
+    @apicall(:LLVMInstructionGetDebugLoc, LLVMMetadataRef, (LLVMValueRef,), Inst)
+end
+
+function LLVMInstructionSetDebugLoc(Inst, Loc)
+    @apicall(:LLVMInstructionSetDebugLoc, Cvoid, (LLVMValueRef, LLVMMetadataRef), Inst, Loc)
+end
+
 function LLVMGetMetadataKind(Metadata)
     @apicall(:LLVMGetMetadataKind, LLVMMetadataKind, (LLVMMetadataRef,), Metadata)
 end
@@ -3094,6 +3227,7 @@ end
 # Automatically generated using Clang.jl
 
 
+
 # Julia wrapper for header: Error.h
 # Automatically generated using Clang.jl
 
@@ -3120,6 +3254,7 @@ end
 
 # Julia wrapper for header: ErrorHandling.h
 # Automatically generated using Clang.jl
+
 
 
 # Julia wrapper for header: ExecutionEngine.h
@@ -3637,24 +3772,44 @@ end
 # Julia wrapper for header: Object.h
 # Automatically generated using Clang.jl
 
-function LLVMCreateObjectFile(MemBuf)
-    @apicall(:LLVMCreateObjectFile, LLVMObjectFileRef, (LLVMMemoryBufferRef,), MemBuf)
+function LLVMCreateBinary(MemBuf, Context, ErrorMessage)
+    @apicall(:LLVMCreateBinary, LLVMBinaryRef, (LLVMMemoryBufferRef, LLVMContextRef, Ptr{Cstring}), MemBuf, Context, ErrorMessage)
 end
 
-function LLVMDisposeObjectFile(ObjectFile)
-    @apicall(:LLVMDisposeObjectFile, Cvoid, (LLVMObjectFileRef,), ObjectFile)
+function LLVMDisposeBinary(BR)
+    @apicall(:LLVMDisposeBinary, Cvoid, (LLVMBinaryRef,), BR)
 end
 
-function LLVMGetSections(ObjectFile)
-    @apicall(:LLVMGetSections, LLVMSectionIteratorRef, (LLVMObjectFileRef,), ObjectFile)
+function LLVMBinaryCopyMemoryBuffer(BR)
+    @apicall(:LLVMBinaryCopyMemoryBuffer, LLVMMemoryBufferRef, (LLVMBinaryRef,), BR)
+end
+
+function LLVMBinaryGetType(BR)
+    @apicall(:LLVMBinaryGetType, LLVMBinaryType, (LLVMBinaryRef,), BR)
+end
+
+function LLVMMachOUniversalBinaryCopyObjectForArch(BR, Arch, ArchLen, ErrorMessage)
+    @apicall(:LLVMMachOUniversalBinaryCopyObjectForArch, LLVMBinaryRef, (LLVMBinaryRef, Cstring, Csize_t, Ptr{Cstring}), BR, Arch, ArchLen, ErrorMessage)
+end
+
+function LLVMObjectFileCopySectionIterator(BR)
+    @apicall(:LLVMObjectFileCopySectionIterator, LLVMSectionIteratorRef, (LLVMBinaryRef,), BR)
+end
+
+function LLVMObjectFileIsSectionIteratorAtEnd(BR, SI)
+    @apicall(:LLVMObjectFileIsSectionIteratorAtEnd, LLVMBool, (LLVMBinaryRef, LLVMSectionIteratorRef), BR, SI)
+end
+
+function LLVMObjectFileCopySymbolIterator(BR)
+    @apicall(:LLVMObjectFileCopySymbolIterator, LLVMSymbolIteratorRef, (LLVMBinaryRef,), BR)
+end
+
+function LLVMObjectFileIsSymbolIteratorAtEnd(BR, SI)
+    @apicall(:LLVMObjectFileIsSymbolIteratorAtEnd, LLVMBool, (LLVMBinaryRef, LLVMSymbolIteratorRef), BR, SI)
 end
 
 function LLVMDisposeSectionIterator(SI)
     @apicall(:LLVMDisposeSectionIterator, Cvoid, (LLVMSectionIteratorRef,), SI)
-end
-
-function LLVMIsSectionIteratorAtEnd(ObjectFile, SI)
-    @apicall(:LLVMIsSectionIteratorAtEnd, LLVMBool, (LLVMObjectFileRef, LLVMSectionIteratorRef), ObjectFile, SI)
 end
 
 function LLVMMoveToNextSection(SI)
@@ -3665,16 +3820,8 @@ function LLVMMoveToContainingSection(Sect, Sym)
     @apicall(:LLVMMoveToContainingSection, Cvoid, (LLVMSectionIteratorRef, LLVMSymbolIteratorRef), Sect, Sym)
 end
 
-function LLVMGetSymbols(ObjectFile)
-    @apicall(:LLVMGetSymbols, LLVMSymbolIteratorRef, (LLVMObjectFileRef,), ObjectFile)
-end
-
 function LLVMDisposeSymbolIterator(SI)
     @apicall(:LLVMDisposeSymbolIterator, Cvoid, (LLVMSymbolIteratorRef,), SI)
-end
-
-function LLVMIsSymbolIteratorAtEnd(ObjectFile, SI)
-    @apicall(:LLVMIsSymbolIteratorAtEnd, LLVMBool, (LLVMObjectFileRef, LLVMSymbolIteratorRef), ObjectFile, SI)
 end
 
 function LLVMMoveToNextSymbol(SI)
@@ -3747,6 +3894,30 @@ end
 
 function LLVMGetRelocationValueString(RI)
     @apicall(:LLVMGetRelocationValueString, Cstring, (LLVMRelocationIteratorRef,), RI)
+end
+
+function LLVMCreateObjectFile(MemBuf)
+    @apicall(:LLVMCreateObjectFile, LLVMObjectFileRef, (LLVMMemoryBufferRef,), MemBuf)
+end
+
+function LLVMDisposeObjectFile(ObjectFile)
+    @apicall(:LLVMDisposeObjectFile, Cvoid, (LLVMObjectFileRef,), ObjectFile)
+end
+
+function LLVMGetSections(ObjectFile)
+    @apicall(:LLVMGetSections, LLVMSectionIteratorRef, (LLVMObjectFileRef,), ObjectFile)
+end
+
+function LLVMIsSectionIteratorAtEnd(ObjectFile, SI)
+    @apicall(:LLVMIsSectionIteratorAtEnd, LLVMBool, (LLVMObjectFileRef, LLVMSectionIteratorRef), ObjectFile, SI)
+end
+
+function LLVMGetSymbols(ObjectFile)
+    @apicall(:LLVMGetSymbols, LLVMSymbolIteratorRef, (LLVMObjectFileRef,), ObjectFile)
+end
+
+function LLVMIsSymbolIteratorAtEnd(ObjectFile, SI)
+    @apicall(:LLVMIsSymbolIteratorAtEnd, LLVMBool, (LLVMObjectFileRef, LLVMSymbolIteratorRef), ObjectFile, SI)
 end
 
 
@@ -3846,6 +4017,106 @@ function LLVMOrcUnregisterJITEventListener(JITStack, L)
 end
 
 
+# Julia wrapper for header: Remarks.h
+# Automatically generated using Clang.jl
+
+function LLVMRemarkStringGetData(String)
+    @apicall(:LLVMRemarkStringGetData, Cstring, (LLVMRemarkStringRef,), String)
+end
+
+function LLVMRemarkStringGetLen(String)
+    @apicall(:LLVMRemarkStringGetLen, UInt32, (LLVMRemarkStringRef,), String)
+end
+
+function LLVMRemarkDebugLocGetSourceFilePath(DL)
+    @apicall(:LLVMRemarkDebugLocGetSourceFilePath, LLVMRemarkStringRef, (LLVMRemarkDebugLocRef,), DL)
+end
+
+function LLVMRemarkDebugLocGetSourceLine(DL)
+    @apicall(:LLVMRemarkDebugLocGetSourceLine, UInt32, (LLVMRemarkDebugLocRef,), DL)
+end
+
+function LLVMRemarkDebugLocGetSourceColumn(DL)
+    @apicall(:LLVMRemarkDebugLocGetSourceColumn, UInt32, (LLVMRemarkDebugLocRef,), DL)
+end
+
+function LLVMRemarkArgGetKey(Arg)
+    @apicall(:LLVMRemarkArgGetKey, LLVMRemarkStringRef, (LLVMRemarkArgRef,), Arg)
+end
+
+function LLVMRemarkArgGetValue(Arg)
+    @apicall(:LLVMRemarkArgGetValue, LLVMRemarkStringRef, (LLVMRemarkArgRef,), Arg)
+end
+
+function LLVMRemarkArgGetDebugLoc(Arg)
+    @apicall(:LLVMRemarkArgGetDebugLoc, LLVMRemarkDebugLocRef, (LLVMRemarkArgRef,), Arg)
+end
+
+function LLVMRemarkEntryDispose(Remark)
+    @apicall(:LLVMRemarkEntryDispose, Cvoid, (LLVMRemarkEntryRef,), Remark)
+end
+
+function LLVMRemarkEntryGetType(Remark)
+    @apicall(:LLVMRemarkEntryGetType, LLVMRemarkType, (LLVMRemarkEntryRef,), Remark)
+end
+
+function LLVMRemarkEntryGetPassName(Remark)
+    @apicall(:LLVMRemarkEntryGetPassName, LLVMRemarkStringRef, (LLVMRemarkEntryRef,), Remark)
+end
+
+function LLVMRemarkEntryGetRemarkName(Remark)
+    @apicall(:LLVMRemarkEntryGetRemarkName, LLVMRemarkStringRef, (LLVMRemarkEntryRef,), Remark)
+end
+
+function LLVMRemarkEntryGetFunctionName(Remark)
+    @apicall(:LLVMRemarkEntryGetFunctionName, LLVMRemarkStringRef, (LLVMRemarkEntryRef,), Remark)
+end
+
+function LLVMRemarkEntryGetDebugLoc(Remark)
+    @apicall(:LLVMRemarkEntryGetDebugLoc, LLVMRemarkDebugLocRef, (LLVMRemarkEntryRef,), Remark)
+end
+
+function LLVMRemarkEntryGetHotness(Remark)
+    @apicall(:LLVMRemarkEntryGetHotness, UInt64, (LLVMRemarkEntryRef,), Remark)
+end
+
+function LLVMRemarkEntryGetNumArgs(Remark)
+    @apicall(:LLVMRemarkEntryGetNumArgs, UInt32, (LLVMRemarkEntryRef,), Remark)
+end
+
+function LLVMRemarkEntryGetFirstArg(Remark)
+    @apicall(:LLVMRemarkEntryGetFirstArg, LLVMRemarkArgRef, (LLVMRemarkEntryRef,), Remark)
+end
+
+function LLVMRemarkEntryGetNextArg(It, Remark)
+    @apicall(:LLVMRemarkEntryGetNextArg, LLVMRemarkArgRef, (LLVMRemarkArgRef, LLVMRemarkEntryRef), It, Remark)
+end
+
+function LLVMRemarkParserCreateYAML(Buf, Size)
+    @apicall(:LLVMRemarkParserCreateYAML, LLVMRemarkParserRef, (Ptr{Cvoid}, UInt64), Buf, Size)
+end
+
+function LLVMRemarkParserGetNext(Parser)
+    @apicall(:LLVMRemarkParserGetNext, LLVMRemarkEntryRef, (LLVMRemarkParserRef,), Parser)
+end
+
+function LLVMRemarkParserHasError(Parser)
+    @apicall(:LLVMRemarkParserHasError, LLVMBool, (LLVMRemarkParserRef,), Parser)
+end
+
+function LLVMRemarkParserGetErrorMessage(Parser)
+    @apicall(:LLVMRemarkParserGetErrorMessage, Cstring, (LLVMRemarkParserRef,), Parser)
+end
+
+function LLVMRemarkParserDispose(Parser)
+    @apicall(:LLVMRemarkParserDispose, Cvoid, (LLVMRemarkParserRef,), Parser)
+end
+
+function LLVMRemarkVersion()
+    @apicall(:LLVMRemarkVersion, UInt32, ())
+end
+
+
 # Julia wrapper for header: Support.h
 # Automatically generated using Clang.jl
 
@@ -3870,12 +4141,15 @@ end
 # Automatically generated using Clang.jl
 
 
+
 # Julia wrapper for header: TargetMachine.h
 # Automatically generated using Clang.jl
 
 
+
 # Julia wrapper for header: Types.h
 # Automatically generated using Clang.jl
+
 
 
 # Julia wrapper for header: lto.h
@@ -4151,6 +4425,22 @@ end
 
 function thinlto_codegen_set_cache_size_files(cg, max_size_files)
     @apicall(:thinlto_codegen_set_cache_size_files, Cvoid, (thinlto_code_gen_t, UInt32), cg, max_size_files)
+end
+
+function lto_input_create(buffer, buffer_size, path)
+    @apicall(:lto_input_create, lto_input_t, (Ptr{Cvoid}, Csize_t, Cstring), buffer, buffer_size, path)
+end
+
+function lto_input_dispose(input)
+    @apicall(:lto_input_dispose, Cvoid, (lto_input_t,), input)
+end
+
+function lto_input_get_num_dependent_libraries(input)
+    @apicall(:lto_input_get_num_dependent_libraries, UInt32, (lto_input_t,), input)
+end
+
+function lto_input_get_dependent_library(input, index, size)
+    @apicall(:lto_input_get_dependent_library, Cstring, (lto_input_t, Csize_t, Ptr{Csize_t}), input, index, size)
 end
 
 
@@ -4475,6 +4765,10 @@ end
 
 function LLVMAddPromoteMemoryToRegisterPass(PM)
     @apicall(:LLVMAddPromoteMemoryToRegisterPass, Cvoid, (LLVMPassManagerRef,), PM)
+end
+
+function LLVMAddAddDiscriminatorsPass(PM)
+    @apicall(:LLVMAddAddDiscriminatorsPass, Cvoid, (LLVMPassManagerRef,), PM)
 end
 
 

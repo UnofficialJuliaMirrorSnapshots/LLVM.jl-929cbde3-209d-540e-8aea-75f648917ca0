@@ -15,6 +15,10 @@ struct LLVMOpaqueBasicBlock end
 const LLVMBasicBlockRef = Ptr{LLVMOpaqueBasicBlock}
 struct LLVMOpaqueMetadata end
 const LLVMMetadataRef = Ptr{LLVMOpaqueMetadata}
+struct LLVMOpaqueNamedMDNode end
+const LLVMNamedMDNodeRef = Ptr{LLVMOpaqueNamedMDNode}
+struct LLVMOpaqueValueMetadataEntry end
+const LLVMValueMetadataEntry = LLVMOpaqueValueMetadataEntry
 struct LLVMOpaqueBuilder end
 const LLVMBuilderRef = Ptr{LLVMOpaqueBuilder}
 struct LLVMOpaqueDIBuilder end
@@ -31,11 +35,27 @@ struct LLVMOpaqueAttributeRef end
 const LLVMAttributeRef = Ptr{LLVMOpaqueAttributeRef}
 struct LLVMOpaqueDiagnosticInfo end
 const LLVMDiagnosticInfoRef = Ptr{LLVMOpaqueDiagnosticInfo}
+const LLVMComdat = Cvoid
+const LLVMComdatRef = Ptr{LLVMComdat}
+struct LLVMOpaqueModuleFlagEntry end
+const LLVMModuleFlagEntry = LLVMOpaqueModuleFlagEntry
+struct LLVMOpaqueJITEventListener end
+const LLVMJITEventListenerRef = Ptr{LLVMOpaqueJITEventListener}
+struct LLVMOpaqueBinary end
+const LLVMBinaryRef = Ptr{LLVMOpaqueBinary}
 
 @cenum LLVMVerifierFailureAction::UInt32 begin
     LLVMAbortProcessAction = 0
     LLVMPrintMessageAction = 1
     LLVMReturnStatusAction = 2
+end
+
+@cenum LLVMComdatSelectionKind::UInt32 begin
+    LLVMAnyComdatSelectionKind = 0
+    LLVMExactMatchComdatSelectionKind = 1
+    LLVMLargestComdatSelectionKind = 2
+    LLVMNoDuplicatesComdatSelectionKind = 3
+    LLVMSameSizeComdatSelectionKind = 4
 end
 
 const LLVMFatalErrorHandler = Ptr{Cvoid}
@@ -47,6 +67,8 @@ const LLVMFatalErrorHandler = Ptr{Cvoid}
     LLVMIndirectBr = 4
     LLVMInvoke = 5
     LLVMUnreachable = 7
+    LLVMCallBr = 67
+    LLVMFNeg = 66
     LLVMAdd = 8
     LLVMFAdd = 9
     LLVMSub = 10
@@ -153,6 +175,12 @@ end
     LLVMProtectedVisibility = 2
 end
 
+@cenum LLVMUnnamedAddr::UInt32 begin
+    LLVMNoUnnamedAddr = 0
+    LLVMLocalUnnamedAddr = 1
+    LLVMGlobalUnnamedAddr = 2
+end
+
 @cenum LLVMDLLStorageClass::UInt32 begin
     LLVMDefaultStorageClass = 0
     LLVMDLLImportStorageClass = 1
@@ -163,10 +191,45 @@ end
     LLVMCCallConv = 0
     LLVMFastCallConv = 8
     LLVMColdCallConv = 9
+    LLVMGHCCallConv = 10
+    LLVMHiPECallConv = 11
     LLVMWebKitJSCallConv = 12
     LLVMAnyRegCallConv = 13
+    LLVMPreserveMostCallConv = 14
+    LLVMPreserveAllCallConv = 15
+    LLVMSwiftCallConv = 16
+    LLVMCXXFASTTLSCallConv = 17
     LLVMX86StdcallCallConv = 64
     LLVMX86FastcallCallConv = 65
+    LLVMARMAPCSCallConv = 66
+    LLVMARMAAPCSCallConv = 67
+    LLVMARMAAPCSVFPCallConv = 68
+    LLVMMSP430INTRCallConv = 69
+    LLVMX86ThisCallCallConv = 70
+    LLVMPTXKernelCallConv = 71
+    LLVMPTXDeviceCallConv = 72
+    LLVMSPIRFUNCCallConv = 75
+    LLVMSPIRKERNELCallConv = 76
+    LLVMIntelOCLBICallConv = 77
+    LLVMX8664SysVCallConv = 78
+    LLVMWin64CallConv = 79
+    LLVMX86VectorCallCallConv = 80
+    LLVMHHVMCallConv = 81
+    LLVMHHVMCCallConv = 82
+    LLVMX86INTRCallConv = 83
+    LLVMAVRINTRCallConv = 84
+    LLVMAVRSIGNALCallConv = 85
+    LLVMAVRBUILTINCallConv = 86
+    LLVMAMDGPUVSCallConv = 87
+    LLVMAMDGPUGSCallConv = 88
+    LLVMAMDGPUPSCallConv = 89
+    LLVMAMDGPUCSCallConv = 90
+    LLVMAMDGPUKERNELCallConv = 91
+    LLVMX86RegCallCallConv = 92
+    LLVMAMDGPUHSCallConv = 93
+    LLVMMSP430BUILTINCallConv = 94
+    LLVMAMDGPULSCallConv = 95
+    LLVMAMDGPUESCallConv = 96
 end
 
 @cenum LLVMValueKind::UInt32 begin
@@ -273,6 +336,20 @@ end
     LLVMDSNote = 3
 end
 
+@cenum LLVMInlineAsmDialect::UInt32 begin
+    LLVMInlineAsmDialectATT = 0
+    LLVMInlineAsmDialectIntel = 1
+end
+
+@cenum LLVMModuleFlagBehavior::UInt32 begin
+    LLVMModuleFlagBehaviorError = 0
+    LLVMModuleFlagBehaviorWarning = 1
+    LLVMModuleFlagBehaviorRequire = 2
+    LLVMModuleFlagBehaviorOverride = 3
+    LLVMModuleFlagBehaviorAppend = 4
+    LLVMModuleFlagBehaviorAppendUnique = 5
+end
+
 # the following isn't defined as a regular enum in llvm-c, so Clang.jl fails to pick it up
 @cenum LLVMAttributeIndex::UInt32 begin
     LLVMAttributeReturnIndex = 0
@@ -307,7 +384,14 @@ const LLVMYieldCallback = Ptr{Cvoid}
     LLVMDIFlagIntroducedVirtual = 262144
     LLVMDIFlagBitField = 524288
     LLVMDIFlagNoReturn = 1048576
-    LLVMDIFlagMainSubprogram = 2097152
+    LLVMDIFlagTypePassByValue = 4194304
+    LLVMDIFlagTypePassByReference = 8388608
+    LLVMDIFlagEnumClass = 16777216
+    LLVMDIFlagFixedEnum = 16777216
+    LLVMDIFlagThunk = 33554432
+    LLVMDIFlagNonTrivial = 67108864
+    LLVMDIFlagBigEndian = 134217728
+    LLVMDIFlagLittleEndian = 268435456
     LLVMDIFlagIndirectVirtualBase = 36
     LLVMDIFlagAccessibility = 3
     LLVMDIFlagPtrToMemberRep = 196608
@@ -362,6 +446,8 @@ end
     LLVMDWARFEmissionLineTablesOnly = 2
 end
 
+const LLVMMetadataKind = UInt32
+const LLVMDWARFTypeEncoding = UInt32
 const LLVMDisassembler_VariantKind_None = 0
 const LLVMDisassembler_VariantKind_ARM_HI16 = 1
 const LLVMDisassembler_VariantKind_ARM_LO16 = 2
@@ -410,6 +496,10 @@ struct LLVMOpInfo1
 end
 
 const LLVMSymbolLookupCallback = Ptr{Cvoid}
+const LLVMErrorSuccess = 0
+struct LLVMOpaqueError end
+const LLVMErrorRef = Ptr{LLVMOpaqueError}
+const LLVMErrorTypeId = Ptr{Cvoid}
 
 @cenum LLVMByteOrdering::UInt32 begin
     LLVMBigEndian = 0
@@ -437,15 +527,19 @@ end
     LLVMRelocStatic = 1
     LLVMRelocPIC = 2
     LLVMRelocDynamicNoPic = 3
+    LLVMRelocROPI = 4
+    LLVMRelocRWPI = 5
+    LLVMRelocROPI_RWPI = 6
 end
 
 @cenum LLVMCodeModel::UInt32 begin
     LLVMCodeModelDefault = 0
     LLVMCodeModelJITDefault = 1
-    LLVMCodeModelSmall = 2
-    LLVMCodeModelKernel = 3
-    LLVMCodeModelMedium = 4
-    LLVMCodeModelLarge = 5
+    LLVMCodeModelTiny = 2
+    LLVMCodeModelSmall = 3
+    LLVMCodeModelKernel = 4
+    LLVMCodeModelMedium = 5
+    LLVMCodeModelLarge = 6
 end
 
 @cenum LLVMCodeGenFileType::UInt32 begin
@@ -494,29 +588,94 @@ const llvm_lto_status_t = llvm_lto_status
     LLVMLinkerPreserveSource_Removed = 1
 end
 
-struct LLVMOpaqueObjectFile end
-const LLVMObjectFileRef = Ptr{LLVMOpaqueObjectFile}
 struct LLVMOpaqueSectionIterator end
 const LLVMSectionIteratorRef = Ptr{LLVMOpaqueSectionIterator}
 struct LLVMOpaqueSymbolIterator end
 const LLVMSymbolIteratorRef = Ptr{LLVMOpaqueSymbolIterator}
 struct LLVMOpaqueRelocationIterator end
 const LLVMRelocationIteratorRef = Ptr{LLVMOpaqueRelocationIterator}
-struct LLVMOpaqueSharedModule end
-const LLVMSharedModuleRef = Ptr{LLVMOpaqueSharedModule}
+
+@cenum LLVMBinaryType::UInt32 begin
+    LLVMBinaryTypeArchive = 0
+    LLVMBinaryTypeMachOUniversalBinary = 1
+    LLVMBinaryTypeCOFFImportFile = 2
+    LLVMBinaryTypeIR = 3
+    LLVMBinaryTypeWinRes = 4
+    LLVMBinaryTypeCOFF = 5
+    LLVMBinaryTypeELF32L = 6
+    LLVMBinaryTypeELF32B = 7
+    LLVMBinaryTypeELF64L = 8
+    LLVMBinaryTypeELF64B = 9
+    LLVMBinaryTypeMachO32L = 10
+    LLVMBinaryTypeMachO32B = 11
+    LLVMBinaryTypeMachO64L = 12
+    LLVMBinaryTypeMachO64B = 13
+    LLVMBinaryTypeWasm = 14
+end
+
+struct LLVMOpaqueObjectFile end
+const LLVMObjectFileRef = Ptr{LLVMOpaqueObjectFile}
+const OPT_REMARKS_API_VERSION = 0
+
+struct LLVMOptRemarkStringRef
+    Str::Cstring
+    Len::UInt32
+end
+
+struct LLVMOptRemarkDebugLoc
+    SourceFile::LLVMOptRemarkStringRef
+    SourceLineNumber::UInt32
+    SourceColumnNumber::UInt32
+end
+
+struct LLVMOptRemarkArg
+    Key::LLVMOptRemarkStringRef
+    Value::LLVMOptRemarkStringRef
+    DebugLoc::LLVMOptRemarkDebugLoc
+end
+
+struct LLVMOptRemarkEntry
+    RemarkType::LLVMOptRemarkStringRef
+    PassName::LLVMOptRemarkStringRef
+    RemarkName::LLVMOptRemarkStringRef
+    FunctionName::LLVMOptRemarkStringRef
+    DebugLoc::LLVMOptRemarkDebugLoc
+    Hotness::UInt32
+    NumArgs::UInt32
+    Args::Ptr{LLVMOptRemarkArg}
+end
+
+const LLVMOptRemarkOpaqueParser = Cvoid
+const LLVMOptRemarkParserRef = Ptr{LLVMOptRemarkOpaqueParser}
 const LLVMOrcOpaqueJITStack = Cvoid
 const LLVMOrcJITStackRef = Ptr{LLVMOrcOpaqueJITStack}
-const LLVMOrcModuleHandle = UInt32
+const LLVMOrcModuleHandle = UInt64
 const LLVMOrcTargetAddress = UInt64
 const LLVMOrcSymbolResolverFn = Ptr{Cvoid}
 const LLVMOrcLazyCompileCallbackFn = Ptr{Cvoid}
+const REMARKS_API_VERSION = 0
 
-@cenum LLVMOrcErrorCode::UInt32 begin
-    LLVMOrcErrSuccess = 0
-    LLVMOrcErrGeneric = 1
+@cenum LLVMRemarkType::UInt32 begin
+    LLVMRemarkTypeUnknown = 0
+    LLVMRemarkTypePassed = 1
+    LLVMRemarkTypeMissed = 2
+    LLVMRemarkTypeAnalysis = 3
+    LLVMRemarkTypeAnalysisFPCommute = 4
+    LLVMRemarkTypeAnalysisAliasing = 5
+    LLVMRemarkTypeFailure = 6
 end
 
-const LTO_API_VERSION = 21
+const LLVMRemarkOpaqueString = Cvoid
+const LLVMRemarkStringRef = Ptr{LLVMRemarkOpaqueString}
+const LLVMRemarkOpaqueDebugLoc = Cvoid
+const LLVMRemarkDebugLocRef = Ptr{LLVMRemarkOpaqueDebugLoc}
+const LLVMRemarkOpaqueArg = Cvoid
+const LLVMRemarkArgRef = Ptr{LLVMRemarkOpaqueArg}
+const LLVMRemarkOpaqueEntry = Cvoid
+const LLVMRemarkEntryRef = Ptr{LLVMRemarkOpaqueEntry}
+const LLVMRemarkOpaqueParser = Cvoid
+const LLVMRemarkParserRef = Ptr{LLVMRemarkOpaqueParser}
+const LTO_API_VERSION = 24
 const lto_bool_t = Bool
 
 @cenum lto_symbol_attributes::UInt32 begin
@@ -574,5 +733,7 @@ struct LTOObjectBuffer
     Size::Csize_t
 end
 
+struct LLVMOpaqueLTOInput end
+const lto_input_t = Ptr{LLVMOpaqueLTOInput}
 struct LLVMOpaquePassManagerBuilder end
 const LLVMPassManagerBuilderRef = Ptr{LLVMOpaquePassManagerBuilder}
